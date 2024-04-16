@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import svm
 from sklearn.decomposition import PCA
+from sklearn.cluster import KMeans
 
 
 # Hero Name Data
@@ -164,3 +165,77 @@ with open(csv_file_path, newline='') as csvfile:
     reader = csv.reader(csvfile)
     for row in reader:
         parsed_data.append(parse_row(row))
+
+print(parsed_data[0])
+
+# Extracting hero data from the dataset
+heroes_data = [d['heroes'] for d in parsed_data]
+
+# Convert heroes data into numpy array
+heroes_array = np.array(heroes_data)
+
+# Number of clusters
+k = 2
+
+# Perform k-means clustering
+kmeans = KMeans(n_clusters=k)
+kmeans.fit(heroes_array)
+
+# Get the cluster centroids and labels
+centroids = kmeans.cluster_centers_
+labels = kmeans.labels_
+
+# Print the centroids and labels
+print("Centroids:")
+print(centroids)
+print("\nLabels:")
+print(labels)
+
+# Example cluster labels (replace with your actual cluster labels)
+cluster_labels = np.array(labels)  # Example cluster labels (0 and 1)
+
+# Example match outcomes (replace with your actual match outcomes)
+match_outcomes = np.array([match['team_won'] for match in parsed_data])  # Example match outcomes (1 for win, 0 for loss)
+
+# Number of clusters (assuming clusters are labeled as integers)
+num_clusters = len(np.unique(cluster_labels))
+
+# Initialize dictionaries to store counts of winning and losing matches in each cluster
+win_count = {}
+loss_count = {}
+
+# Iterate through each cluster
+for cluster_label in range(num_clusters):
+    # Get the indices of matches in the current cluster
+    cluster_indices = np.where(cluster_labels == cluster_label)[0]
+    
+    # Count the number of winning and losing matches in the current cluster
+    win_count[cluster_label] = np.sum(match_outcomes[cluster_indices] == 1)
+    loss_count[cluster_label] = np.sum(match_outcomes[cluster_indices] == 0)
+
+# Calculate proportions of winning and losing matches in each cluster
+total_matches = len(match_outcomes)
+win_proportions = {cluster_label: count / total_matches for cluster_label, count in win_count.items()}
+loss_proportions = {cluster_label: count / total_matches for cluster_label, count in loss_count.items()}
+
+# Visualize the outcome distribution
+fig, ax = plt.subplots(figsize=(8, 6))
+clusters = np.arange(num_clusters)
+bar_width = 0.35
+opacity = 0.8
+
+# Bar plot for winning matches
+ax.bar(clusters, list(win_proportions.values()), bar_width, alpha=opacity, color='b', label='Winning Matches')
+
+# Bar plot for losing matches
+ax.bar(clusters + bar_width, list(loss_proportions.values()), bar_width, alpha=opacity, color='r', label='Losing Matches')
+
+ax.set_xlabel('Cluster')
+ax.set_ylabel('Proportion')
+ax.set_title('Outcome Distribution in Clusters')
+ax.set_xticks(clusters + bar_width / 2)
+ax.set_xticklabels(clusters)
+ax.legend()
+
+plt.tight_layout()
+plt.show()
