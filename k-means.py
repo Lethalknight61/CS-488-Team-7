@@ -273,6 +273,7 @@ plt.show()
 silhouette_avg = silhouette_score(data_2d, cluster_labels)
 print("Silhouette Score:", silhouette_avg)
 
+
 """
 # 1. Parse New Data
 new_parsed_data = []
@@ -308,11 +309,12 @@ new_loss_proportions = {cluster_label: count / new_total_matches for cluster_lab
 # Use the calculated win/loss proportions to predict outcomes for new matches
 
 # Example:
-threshold = 0.1 # If win proportion is greater than threshold, predict win
+
 predictions = {}
 for cluster_label in range(num_clusters):
-    if new_win_proportions[cluster_label] > threshold:
+    if new_win_proportions[cluster_label] > 0:
         predictions[cluster_label] = "Win"
+        print(new_win_proportions[cluster_label])
     else:
         predictions[cluster_label] = "Loss"
 
