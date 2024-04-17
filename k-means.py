@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from sklearn import svm
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
 
 
 # Hero Name Data
@@ -219,11 +220,8 @@ loss_proportions = {cluster_label: count / total_matches for cluster_label, coun
 print (win_proportions)
 print (loss_proportions)
 
-
-# Assuming you have already performed clustering and have cluster labels
-# Replace these with your actual cluster labels and data
-  # Example cluster labels (0 and 1)
 numerical_features = np.array([match['heroes'] for match in parsed_data])
+
 # Perform dimensionality reduction using PCA
 pca = PCA(n_components=2)
 data_2d = pca.fit_transform(numerical_features)
@@ -246,3 +244,77 @@ plt.ylabel('Principal Component 2')
 plt.legend()
 plt.grid(True)
 plt.show()
+
+
+"""
+# Define a range of cluster numbers to try
+k_values = range(2, 9)  # Try cluster numbers from 2 to 10
+
+# List to store silhouette scores
+silhouette_scores = []
+
+# Iterate over each value of k
+for k in k_values:
+    kmeans = KMeans(n_clusters=k)
+    cluster_labels = kmeans.fit_predict(heroes_array)
+    silhouette_avg = silhouette_score(heroes_array, cluster_labels)
+    silhouette_scores.append(silhouette_avg)
+
+# Plot the silhouette scores
+plt.plot(k_values, silhouette_scores, marker='o')
+plt.xlabel('Number of Clusters')
+plt.ylabel('Silhouette Score')
+plt.title('Silhouette Score vs. Number of Clusters')
+plt.xticks(k_values)
+plt.show()
+
+
+"""
+silhouette_avg = silhouette_score(data_2d, cluster_labels)
+print("Silhouette Score:", silhouette_avg)
+
+"""
+# 1. Parse New Data
+new_parsed_data = []
+with open('dota2Test.csv', newline='') as csvfile:
+    reader = csv.reader(csvfile)
+    for row in reader:
+        new_parsed_data.append(parse_row(row))
+
+# 2. Predict Cluster Labels
+new_numerical_features = np.array([match['heroes'] for match in new_parsed_data])
+new_cluster_labels = kmeans.predict(new_numerical_features)
+
+# 3. Calculate Win/Loss Proportions for New Data
+# Calculate win and loss proportions for the new data based on cluster labels
+new_win_count = {}
+new_loss_count = {}
+new_match_outcomes = np.array([match['team_won'] for match in new_parsed_data])
+
+for cluster_label in range(num_clusters):
+    # Get the indices of matches in the current cluster
+    cluster_indices = np.where(new_cluster_labels == cluster_label)[0]
+    
+    # Count the number of winning and losing matches in the current cluster
+    new_win_count[cluster_label] = np.sum(new_match_outcomes[cluster_indices] == 1)
+    new_loss_count[cluster_label] = np.sum(new_match_outcomes[cluster_indices] == -1)
+
+# Calculate proportions of winning and losing matches in each cluster for the new data
+new_total_matches = len(new_match_outcomes)
+new_win_proportions = {cluster_label: count / new_total_matches for cluster_label, count in new_win_count.items()}
+new_loss_proportions = {cluster_label: count / new_total_matches for cluster_label, count in new_loss_count.items()}
+
+# 4. Make Predictions
+# Use the calculated win/loss proportions to predict outcomes for new matches
+
+# Example:
+threshold = 0.1 # If win proportion is greater than threshold, predict win
+predictions = {}
+for cluster_label in range(num_clusters):
+    if new_win_proportions[cluster_label] > threshold:
+        predictions[cluster_label] = "Win"
+    else:
+        predictions[cluster_label] = "Loss"
+
+print(predictions)
+"""
