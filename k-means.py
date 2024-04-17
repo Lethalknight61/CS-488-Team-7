@@ -121,6 +121,7 @@ heroes_data = {
     112: "Winter Wyvern",
     113: "Arc Warden"
 }
+
 heroNames = list(heroes_data.values())
 heroKeys = list(heroes_data.keys())
 
@@ -142,7 +143,6 @@ def parse_row(row):
         elif heroes[i] == 1:
             team2_heroes.append(heroNames[i])
     
-
     # Returning the parsed data
     return {
         'team_won': team_won,
@@ -166,8 +166,6 @@ with open(csv_file_path, newline='') as csvfile:
     for row in reader:
         parsed_data.append(parse_row(row))
 
-print(parsed_data[0])
-
 # Extracting hero data from the dataset
 heroes_data = [d['heroes'] for d in parsed_data]
 
@@ -175,7 +173,7 @@ heroes_data = [d['heroes'] for d in parsed_data]
 heroes_array = np.array(heroes_data)
 
 # Number of clusters
-k = 2
+k = 4
 
 # Perform k-means clustering
 kmeans = KMeans(n_clusters=k)
@@ -191,11 +189,11 @@ print(centroids)
 print("\nLabels:")
 print(labels)
 
-# Example cluster labels (replace with your actual cluster labels)
-cluster_labels = np.array(labels)  # Example cluster labels (0 and 1)
+# cluster labels 
+cluster_labels = np.array(labels)
 
-# Example match outcomes (replace with your actual match outcomes)
-match_outcomes = np.array([match['team_won'] for match in parsed_data])  # Example match outcomes (1 for win, 0 for loss)
+# match outcomes 
+match_outcomes = np.array([match['team_won'] for match in parsed_data])
 
 # Number of clusters (assuming clusters are labeled as integers)
 num_clusters = len(np.unique(cluster_labels))
@@ -238,4 +236,30 @@ ax.set_xticklabels(clusters)
 ax.legend()
 
 plt.tight_layout()
+plt.show()
+
+# Assuming you have already performed clustering and have cluster labels
+# Replace these with your actual cluster labels and data
+  # Example cluster labels (0 and 1)
+numerical_features = np.array([match['heroes'] for match in parsed_data])
+# Perform dimensionality reduction using PCA
+pca = PCA(n_components=2)
+data_2d = pca.fit_transform(numerical_features)
+
+# Plot data points colored by cluster
+plt.figure(figsize=(8, 6))
+for cluster_label in np.unique(cluster_labels):
+    plt.scatter(data_2d[cluster_labels == cluster_label, 0],
+                data_2d[cluster_labels == cluster_label, 1],
+                label=f'Cluster {cluster_label}')
+
+# Optionally, plot cluster centroids
+centroid_2d = pca.transform(centroids)  # If you have cluster centroids
+plt.scatter(centroid_2d[:, 0], centroid_2d[:, 1], marker='X', color='black', s=100, label='Centroids')
+
+plt.title('Scatter Plot with Clustering Results')
+plt.xlabel('Principal Component 1')
+plt.ylabel('Principal Component 2')
+plt.legend()
+plt.grid(True)
 plt.show()
