@@ -164,3 +164,4 @@ with open(csv_file_path, newline='') as csvfile:
     reader = csv.reader(csvfile)
     for row in reader:
         parsed_data.append(parse_row(row))
+
