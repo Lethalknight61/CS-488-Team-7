@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 from sklearn import svm
 from sklearn.decomposition import PCA
 
-
 # Hero Name Data
 heroes_data = {
     1: "Anti-Mage",
@@ -123,6 +122,7 @@ heroes_data = {
 heroNames = list(heroes_data.values())
 heroKeys = list(heroes_data.keys())
 
+
 # Function to parse a single row
 def parse_row(row):
     # Extracting the features
@@ -131,16 +131,15 @@ def parse_row(row):
     game_mode = int(row[2])
     game_type = int(row[3])
     heroes = [int(hero) for hero in row[4:]]
-    
+
     team1_heroes = []
     team2_heroes = []
 
-    for i in range(len(heroes)-1):
+    for i in range(len(heroes) - 1):
         if heroes[i] == -1:
             team1_heroes.append(heroNames[i])
         elif heroes[i] == 1:
             team2_heroes.append(heroNames[i])
-    
 
     # Returning the parsed data
     return {
@@ -153,6 +152,7 @@ def parse_row(row):
         'heroes': heroes
     }
 
+
 # Path to the CSV file
 csv_file_path = 'dota2Train.csv'
 
@@ -164,5 +164,3 @@ with open(csv_file_path, newline='') as csvfile:
     reader = csv.reader(csvfile)
     for row in reader:
         parsed_data.append(parse_row(row))
-
-print(parsed_data)
