@@ -209,34 +209,16 @@ for cluster_label in range(num_clusters):
     
     # Count the number of winning and losing matches in the current cluster
     win_count[cluster_label] = np.sum(match_outcomes[cluster_indices] == 1)
-    loss_count[cluster_label] = np.sum(match_outcomes[cluster_indices] == 0)
+    loss_count[cluster_label] = np.sum(match_outcomes[cluster_indices] == -1)
 
 # Calculate proportions of winning and losing matches in each cluster
 total_matches = len(match_outcomes)
 win_proportions = {cluster_label: count / total_matches for cluster_label, count in win_count.items()}
 loss_proportions = {cluster_label: count / total_matches for cluster_label, count in loss_count.items()}
 
-# Visualize the outcome distribution
-fig, ax = plt.subplots(figsize=(8, 6))
-clusters = np.arange(num_clusters)
-bar_width = 0.35
-opacity = 0.8
+print (win_proportions)
+print (loss_proportions)
 
-# Bar plot for winning matches
-ax.bar(clusters, list(win_proportions.values()), bar_width, alpha=opacity, color='b', label='Winning Matches')
-
-# Bar plot for losing matches
-ax.bar(clusters + bar_width, list(loss_proportions.values()), bar_width, alpha=opacity, color='r', label='Losing Matches')
-
-ax.set_xlabel('Cluster')
-ax.set_ylabel('Proportion')
-ax.set_title('Outcome Distribution in Clusters')
-ax.set_xticks(clusters + bar_width / 2)
-ax.set_xticklabels(clusters)
-ax.legend()
-
-plt.tight_layout()
-plt.show()
 
 # Assuming you have already performed clustering and have cluster labels
 # Replace these with your actual cluster labels and data
@@ -251,7 +233,8 @@ plt.figure(figsize=(8, 6))
 for cluster_label in np.unique(cluster_labels):
     plt.scatter(data_2d[cluster_labels == cluster_label, 0],
                 data_2d[cluster_labels == cluster_label, 1],
-                label=f'Cluster {cluster_label}')
+
+                label=f'Cluster {cluster_label+1}')
 
 # Optionally, plot cluster centroids
 centroid_2d = pca.transform(centroids)  # If you have cluster centroids
